@@ -80,13 +80,13 @@ export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
           Nova Lista
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-full max-w-xs sm:max-w-md p-4 sm:p-8">
         <DialogHeader>
-          <DialogTitle>Criar Nova Lista de Estudos</DialogTitle>
-          <DialogDescription>Configure sua nova lista de estudos por ciclos</DialogDescription>
+          <DialogTitle className="text-lg sm:text-2xl">Criar Nova Lista de Estudos</DialogTitle>
+          <DialogDescription className="text-sm sm:text-base">Configure sua nova lista de estudos por ciclos</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-2 sm:py-4">
             <div className="space-y-2">
               <Label htmlFor="title">Título</Label>
               <Input
@@ -95,6 +95,7 @@ export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Ex: Matemática Básica"
                 required
+                className="text-base sm:text-lg"
               />
             </div>
             <div className="space-y-2">
@@ -105,12 +106,13 @@ export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Descreva o conteúdo desta lista..."
                 rows={3}
+                className="text-base sm:text-lg"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="duration">Duração do Ciclo</Label>
               <Select value={cycleDuration} onValueChange={setCycleDuration}>
-                <SelectTrigger>
+                <SelectTrigger className="text-base sm:text-lg">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -124,7 +126,7 @@ export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Criar Lista
             </Button>

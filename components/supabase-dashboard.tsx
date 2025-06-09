@@ -7,11 +7,13 @@ import { CreateListDialog } from "./supabase-create-list-dialog"
 import { StudyListCard } from "./supabase-study-list-card"
 import { useAuth } from "@/lib/auth"
 import { supabase, type StudyList } from "@/lib/supabase"
+import { useToast } from "@/components/ui/use-toast"
 
 export function Dashboard() {
   const [lists, setLists] = useState<StudyList[]>([])
   const [loading, setLoading] = useState(true)
   const { user, signOut } = useAuth()
+  const { toast } = useToast()
 
   const loadLists = async () => {
     try {
@@ -24,8 +26,13 @@ export function Dashboard() {
 
       if (error) throw error
       setLists(data || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading lists:", error)
+      toast({
+        title: "Erro ao carregar listas",
+        description: error.message || "Ocorreu um erro ao buscar suas listas.",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
@@ -38,8 +45,13 @@ export function Dashboard() {
   const handleSignOut = async () => {
     try {
       await signOut()
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing out:", error)
+      toast({
+        title: "Erro ao sair",
+        description: error.message || "Ocorreu um erro ao sair da conta.",
+        variant: "destructive",
+      })
     }
   }
 

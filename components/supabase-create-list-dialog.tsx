@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useUser } from "@clerk/nextjs"
+import { useToast } from "@/components/ui/use-toast"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -27,6 +28,7 @@ interface CreateListDialogProps {
 
 export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
   const { user } = useUser()
+  const { toast } = useToast()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -53,9 +55,18 @@ export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
       setCycleDuration("7")
       setOpen(false)
       onListCreated()
-    } catch (error) {
+      toast({
+        title: "Lista criada com sucesso!",
+        description: `A lista '${title}' foi criada.`,
+        variant: "default",
+      })
+    } catch (error: any) {
       console.error("Error creating list:", error)
-      alert("Erro ao criar lista")
+      toast({
+        title: "Erro ao criar lista",
+        description: error.message || "Ocorreu um erro ao criar a lista.",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }

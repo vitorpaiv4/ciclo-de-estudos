@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useAuth } from "@clerk/nextjs"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,7 @@ interface CreateListDialogProps {
 }
 
 export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
+  const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -36,7 +38,9 @@ export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
     setLoading(true)
 
     try {
+      if (!user) throw new Error("Usuário não autenticado")
       const { error } = await supabase.from("study_lists").insert({
+        user_id: user.id,
         title,
         description: description || null,
         cycle_duration: Number.parseInt(cycleDuration),

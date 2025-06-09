@@ -15,7 +15,12 @@ export function Dashboard() {
 
   const loadLists = async () => {
     try {
-      const { data, error } = await supabase.from("study_lists").select("*").order("created_at", { ascending: false })
+      if (!user) return
+      const { data, error } = await supabase
+        .from("study_lists")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
 
       if (error) throw error
       setLists(data || [])

@@ -13,12 +13,14 @@ import { supabase, type StudyList, type StudyItem } from "@/lib/supabase"
 interface StudyListCardProps {
   list: StudyList
   onListDeleted: () => void
+  collapsible?: boolean
 }
 
-export function StudyListCard({ list, onListDeleted }: StudyListCardProps) {
+export function StudyListCard({ list, onListDeleted, collapsible }: StudyListCardProps) {
   const [items, setItems] = useState<StudyItem[]>([])
   const [cycles, setCycles] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [collapsed, setCollapsed] = useState(false)
 
   const loadItems = async () => {
     try {
@@ -142,84 +144,60 @@ export function StudyListCard({ list, onListDeleted }: StudyListCardProps) {
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-lg">{list.title}</CardTitle>
-              {cycles.length > 0 && (
-                <Badge variant="secondary" className="gap-1">
-                  <Trophy className="h-3 w-3" />
-                  {cycles.length} ciclo{cycles.length > 1 ? "s" : ""}
-                </Badge>
-              )}
-            </div>
-            {list.description && <CardDescription>{list.description}</CardDescription>}
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={deleteList}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4" />
+    <Card className={`bg-white/70 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-lg transition-all duration-200 ${collapsed ? 'max-h-24 overflow-hidden' : ''}`}>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-white tracking-tight">{list.title}</CardTitle>
+          <CardDescription className="flex items-center gap-2 mt-1 text-zinc-500 dark:text-zinc-400">
+            <Calendar className="h-4 w-4" />
+            <span className="font-medium">{formatDuration(list.cycle_duration)}</span>
+            <Clock className="h-4 w-4 ml-2" />
+            <span className="font-medium">{formatTime(totalTime)}</span>
+          </CardDescription>
+        </div>
+        <div className="flex items-center gap-2">
+          {collapsible && (
+            <Button variant="ghost" size="icon" className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white" onClick={() => setCollapsed((c) => !c)} title={collapsed ? 'Expandir' : 'Recolher'}>
+              <span className={`transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}>▼</span>
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" className="text-zinc-400 dark:text-red-400 hover:text-red-500 dark:hover:text-red-300 hover:bg-zinc-100 dark:hover:bg-zinc-800" onClick={deleteList}>
+            <Trash2 className="h-5 w-5" />
           </Button>
         </div>
-
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            {formatDuration(list.cycle_duration)}
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            {formatTime(totalTime)}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span>Progresso</span>
-            <span>
-              {completedItems}/{totalItems}
-            </span>
-          </div>
-          <Progress value={progress} className="h-2" />
-        </div>
       </CardHeader>
-
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="font-medium">Itens de Estudo</h4>
-          <AddItemDialog listId={list.id} onItemAdded={loadItems} />
-        </div>
-
-        {loading ? (
-          <div className="text-center py-4 text-muted-foreground">Carregando...</div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-4 text-muted-foreground">Nenhum item adicionado ainda</div>
-        ) : (
-          <div className="space-y-2">
-            {items.map((item) => (
-              <div key={item.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                <Checkbox
-                  checked={item.is_completed}
-                  onCheckedChange={(checked) => toggleItem(item.id, checked as boolean)}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${item.is_completed ? "line-through text-muted-foreground" : ""}`}>
-                    {item.title}
-                  </p>
-                </div>
-                <Badge variant="secondary" className="text-xs">
-                  {formatTime(item.estimated_time)}
-                </Badge>
-              </div>
-            ))}
+      {!collapsed && (
+        <CardContent className="pt-0">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium text-zinc-700 dark:text-zinc-200">Itens de Estudo</h4>
+            <AddItemDialog listId={list.id} onItemAdded={loadItems} />
           </div>
-        )}
-      </CardContent>
+          {loading ? (
+            <div className="text-center py-4 text-zinc-400 dark:text-zinc-500">Carregando...</div>
+          ) : items.length === 0 ? (
+            <div className="text-center py-4 text-zinc-400 dark:text-zinc-500">Nenhum item adicionado ainda</div>
+          ) : (
+            <div className="space-y-2">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                  <Checkbox
+                    checked={item.is_completed}
+                    onCheckedChange={(checked) => toggleItem(item.id, checked as boolean)}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium ${item.is_completed ? "line-through text-zinc-400 dark:text-zinc-500" : "text-zinc-800 dark:text-zinc-100"}`}>
+                      {item.title}
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border-none">
+                    {formatTime(item.estimated_time)}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      )}
     </Card>
   )
 }

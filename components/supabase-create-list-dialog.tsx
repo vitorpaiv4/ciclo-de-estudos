@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useAuth } from "@clerk/nextjs"
+import { useUser } from "@clerk/nextjs"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -26,7 +26,7 @@ interface CreateListDialogProps {
 }
 
 export function CreateListDialog({ onListCreated }: CreateListDialogProps) {
-  const { user } = useAuth()
+  const { user } = useUser()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
